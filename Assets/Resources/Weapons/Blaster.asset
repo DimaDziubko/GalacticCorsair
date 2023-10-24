@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a38af78ead094a149b201db90233453f, type: 3}
+  m_Name: Blaster
+  m_EditorClassIdentifier: 
+  Type: 1
+  WeaponPrefab: {fileID: 8777647115217816031, guid: 8516c82df5e1448dbf53ab9eeb04bc96,
+    type: 3}
+  ProjectilePrefab: {fileID: 9030721388223467918, guid: fbcc89b32a894c648b9741d64acf738c,
+    type: 3}
+  ImpactPrefab: {fileID: 2067353328656520766, guid: 3e9dd5a645d15b84198ab62c4104b0e8,
+    type: 3}
+  ImpactDuration: 2
+  MuzzleFlash: {fileID: 7921842013159384712, guid: c23a244e76e3d7f4d8e7463d7d5529a7,
+    type: 3}
+  MuzzleDuration: 1
+  ShotSound: {fileID: 8300000, guid: 74dd661f6672b64419ffad6c6c9bf4fc, type: 3}
+  HitSound: {fileID: 8300000, guid: c5d18e26fc4b0ea449d6a2d51542e2cb, type: 3}
+  Letter: B
+  color: {r: 0, g: 0.75355816, b: 1, a: 1}
+  DamageOnHit: 1
+  ContinuousDamage: 0
+  DelayBetweenShots: 0.4
+  Velocity: 30

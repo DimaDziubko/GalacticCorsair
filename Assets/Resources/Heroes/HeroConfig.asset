@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a963033b980943ad9f877f0e52353e3a, type: 3}
+  m_Name: HeroConfig
+  m_EditorClassIdentifier: 
+  Type: 1
+  Prefab: {fileID: 5572380229618775056, guid: b15d1f3ac01457442abffb23146abc85, type: 3}
+  Speed: 30
+  RollMult: -45
+  PitchMult: 30
+  Health: 5
+  ShieldCapacity: 4
+  RippleDuration: 1
+  ShieldHitSound: {fileID: 8300000, guid: ae0934ec15c75ee41ad801b67fb51bb4, type: 3}
