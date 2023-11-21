@@ -1,20 +1,20 @@
-﻿using _Game._Hero.Scripts.Factory;
+﻿using System.Collections.Generic;
+using _Game._Hero.Scripts.Factory;
 using _Game._Weapon._Projectile.Factory;
+using _Game.Core.Loading.Scripts;
 using _Game.Core.Services.Camera;
 using _Game.Core.Services.Random;
 using _Game.Enemies.Scripts.Factory;
-using _Game.Levels.Level_1.Scripts;
-using _Game.Utils;
-using _Game.Utils.Extensions;
+using _Game.PowerUp.Scripts.Factory;
 using _Game.Vfx.Scripts.Factory;
-using UnityEngine.SceneManagement;
+using Cysharp.Threading.Tasks;
 
 namespace _Game.Core.GameState
 {
-    public class LoadLevelState : IPayloadedState<string>
+    public class LoadLevelState : IState
     {
         private readonly SceneLoader _sceneLoader;
-        private readonly GameStateMachine _stateMachine;
+        private readonly IGameStateMachine _stateMachine;
 
         private readonly IHeroFactory _heroFactory;
         private readonly IEnemyFactory _enemyFactory;
@@ -22,7 +22,9 @@ namespace _Game.Core.GameState
         private readonly IRandomService _randomService;
         private readonly IProjectileFactory _projectileFactory;
         private readonly IVfxFactory _vfxFactory;
-        
+        private readonly IPowerUpFactory _powerUpFactory;
+        private readonly ILoadingScreenProvider _loadingProvider;
+
         //private readonly LoadingCurtain _curtain;
         //private readonly IGameFactory _gameFactory;
         //private readonly IPersistentProgressService _progressService;
@@ -30,15 +32,16 @@ namespace _Game.Core.GameState
         //private readonly IUIFactory _uiFactory;
 
         public LoadLevelState(
-            GameStateMachine stateMachine, 
+            IGameStateMachine stateMachine, 
             SceneLoader sceneLoader,
             IHeroFactory heroFactory,
             IWorldCameraService cameraService,
             IEnemyFactory enemyFactory,
             IRandomService randomService,
             IProjectileFactory projectileFactory,
-            IVfxFactory vfxFactory)
-            // LoadingCurtain curtain, 
+            IVfxFactory vfxFactory,
+            IPowerUpFactory powerUpFactory,
+            ILoadingScreenProvider loadingProvider)
             // IGameFactory gameFactory,
             // IPersistentProgressService progressService,
             // IStaticDataService staticData
@@ -52,7 +55,8 @@ namespace _Game.Core.GameState
             _randomService = randomService;
             _projectileFactory = projectileFactory;
             _vfxFactory = vfxFactory;
-            // _curtain = curtain;
+            _powerUpFactory = powerUpFactory;
+            _loadingProvider = loadingProvider;
             // _gameFactory =  gameFactory;
             // _progressService = progressService;
             // _staticData = staticData;
@@ -60,33 +64,35 @@ namespace _Game.Core.GameState
 
         }
 
-        public void Enter(string sceneName)
+        public void Enter()
         {
-            // _curtain.Show();
             // _gameFactory.Cleanup();
             // _gameFactory.WarmUp();
-            _sceneLoader.Load(sceneName, OnLoaded);
+            Load();
+            _stateMachine.Enter<GameLoopState>();
         }
 
         public void Exit()
         {
-            // _curtain.Hide();
+            
         }
 
-        private void OnLoaded()
+        private void Load()
         {
-            
-            Scene scene = SceneManager.GetSceneByName(Constants.Scenes.LEVEL_1);
-            Level level = scene.GetRoot<Level>();
-
-            level.Initialize(
-                _heroFactory,
-                _cameraService,
-                _enemyFactory,
-                _randomService,
-                _projectileFactory,
-                _vfxFactory);
-            level.BeginGame();
+            var loadingOperations = new Queue<ILoadingOperation>();
+            loadingOperations.Enqueue(
+                new LevelLoadingOperation(
+                    _sceneLoader,
+                    _heroFactory,
+                    _cameraService,
+                    _enemyFactory,
+                    _randomService,
+                    _projectileFactory,
+                    _vfxFactory,
+                    _powerUpFactory,
+                    _stateMachine
+                    ));
+            _loadingProvider.LoadAndDestroy(loadingOperations).Forget();
 
             _stateMachine.Enter<GameLoopState>();
         }

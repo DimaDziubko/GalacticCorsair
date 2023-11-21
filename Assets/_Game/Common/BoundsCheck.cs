@@ -1,4 +1,3 @@
-using System;
 using _Game.Core.Services.Camera;
 using UnityEngine;
 
@@ -6,8 +5,6 @@ namespace _Game.Common
 {
     public class BoundsCheck : MonoBehaviour
     {
-        public event Action OffScreen;
-        
         [Header("Set in Inspector")]
         public float Radius = 1f;
         public bool KeepOnScreen = true;
@@ -35,28 +32,24 @@ namespace _Game.Common
                 pos.x = _cameraService.CameraWidth  - Radius;
                 IsOnScreen = false;
                 _offRight = true;
-                OffScreen?.Invoke();
             }
             if (pos.x < -_cameraService.CameraWidth  + Radius)
             {
                 pos.x = -_cameraService.CameraWidth  + Radius;
                 IsOnScreen = false;
                 _offLeft = true;
-                OffScreen?.Invoke();
             }
             if (pos.y > _cameraService.CameraHeight  - Radius)
             {
                 pos.y = _cameraService.CameraHeight - Radius;
                 IsOnScreen = false;
                 _offUp = true;
-                OffScreen?.Invoke();
             }
             if (pos.y < -_cameraService.CameraHeight + Radius)
             {
                 pos.y = -_cameraService.CameraHeight + Radius;
                 IsOnScreen = false;
                 _offDown = true;
-                OffScreen?.Invoke();
             }
 
             IsOnScreen = !(_offRight || _offLeft || _offUp || _offDown);

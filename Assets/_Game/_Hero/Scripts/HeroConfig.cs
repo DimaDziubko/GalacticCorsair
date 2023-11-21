@@ -1,9 +1,10 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace _Game._Hero.Scripts
 {
-    [CreateAssetMenu(fileName = "HeroConfig", menuName = "StaticData/Hero Config")]
-    public class HeroConfig : ScriptableObject
+    [Serializable]
+    public class HeroConfig
     {
         public HeroType Type = HeroType.None;
         
@@ -28,6 +29,8 @@ namespace _Game._Hero.Scripts
         public float RippleDuration = 1f;
 
         public AudioClip ShieldHitSound;
+
+        public HeroMovementConfig MovementConfig;
 
     }
 }

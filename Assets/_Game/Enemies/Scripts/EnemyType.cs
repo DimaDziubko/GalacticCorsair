@@ -4,5 +4,6 @@
     {
         None = 0,
         Ufo = 1, 
+        Serpent = 2, 
     }
 }

@@ -4,5 +4,6 @@
     {
         None = 0,
         Hawk = 1,
+        Sparrow = 2,
     }
 }

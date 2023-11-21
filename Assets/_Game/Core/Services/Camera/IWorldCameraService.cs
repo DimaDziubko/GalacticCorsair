@@ -4,5 +4,7 @@
     {
         float CameraHeight { get; }
         float CameraWidth { get; }
+        
+        UnityEngine.Camera UICamera { get; }
     }
 }

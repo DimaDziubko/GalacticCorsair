@@ -39,16 +39,14 @@ namespace _Game._Hero.Scripts.Factory
             Hero instance = CreateGameObjectInstance(config.Prefab);
             instance.Construct(
                 _inputService,
-                config.Speed,
-                config.RollMult,
-                config.PitchMult,
                 config.Health,
                 config.ShieldCapacity,
                 config.RippleDuration,
                 _weaponFactory,
                 _cameraService,
                 _audioSourceService,
-                config.ShieldHitSound);
+                config.ShieldHitSound,
+                config.MovementConfig);
             instance.OriginFactory = this;
             
             return instance;

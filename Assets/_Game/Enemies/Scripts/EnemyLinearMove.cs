@@ -1,38 +1,10 @@
-﻿using _Game.Core.Services.Camera;
-using _Game.Core.Services.Random;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace _Game.Enemies.Scripts
 {
-    public class EnemyLinearMove : MonoBehaviour
+    public class EnemyLinearMove : EnemyMove
     {
-        private float _speed;
-        private IWorldCameraService _cameraService;
-        private IRandomService _randomService;
-
-        private Vector3 _direction;
-        
-        public void Initialize(
-            float speed, 
-            IWorldCameraService cameraService, 
-            IRandomService randomService)
-        {
-            _speed = speed;
-            _cameraService = cameraService;
-            _randomService = randomService;
-        }
-         public Vector3 Position
-         {
-             get => transform.position;
-             set => transform.position = value;
-         }
-
-         public void GameUpdate()
-         {
-             Move();
-         }
-
-         private void Move()
+        protected override void Move()
          {
              if (_direction == Vector3.zero)
              {
@@ -47,12 +19,6 @@ namespace _Game.Enemies.Scripts
              
              Quaternion targetRotation = Quaternion.LookRotation(_direction, Vector3.back);
              transform.rotation = targetRotation;
-         }
-
-         private Vector3 SelectGuidePoint()
-         {
-             return new Vector3 (_randomService.Next(-_cameraService.CameraWidth / 2, _cameraService.CameraWidth / 2),
-                 _randomService.Next(-_cameraService.CameraHeight / 2, _cameraService.CameraHeight / 2), 0);
          }
     }
 }

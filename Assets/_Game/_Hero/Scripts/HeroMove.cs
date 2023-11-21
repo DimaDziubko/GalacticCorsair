@@ -4,14 +4,21 @@ namespace _Game._Hero.Scripts
 {
     public class HeroMove : MonoBehaviour
     {
+        [SerializeField] private JetStream _jetStream;
+        
         private IInputService _inputService;
         
-        private float _speed;
-        private float _rollMax;
-        private float _pitchMax;
+        private HeroMovementConfig _movementConfig;
+
+        private Vector3 _direction = Vector3.up;
+        private float _currentPitch;
+        private float _currentRoll;
+        private float _currentSpeed;
+
 
         [SerializeField] private Transform modelTransform;
         public Vector3 Direction => _direction;
+
 
         public Vector3 Position
         {
@@ -24,36 +31,21 @@ namespace _Game._Hero.Scripts
             get => transform.rotation;
             set => transform.rotation = value;
         }
-        
-        public void Construct(IInputService inputService, float speed, float rollMult, float pitchMult)
+
+        public void Construct(
+            IInputService inputService,
+            HeroMovementConfig movementConfig)
         {
             _inputService = inputService;
-            _speed = speed;
-            _rollMax = rollMult;
-            _pitchMax = pitchMult;
+            _movementConfig = movementConfig;
         }
-        
+
         public void GameUpdate()
         {
             Move();
+            if(_jetStream) 
+                _jetStream.GameUpdate(_currentSpeed, _movementConfig.Speed);
         }
-        
-        private float _yawSpeed = 180f;
-        private Vector3 _direction = Vector3.up;
-        //private Vector3 _movement;
-
-        private float _pitchSmoothFactor = 1f;
-        private float _currentPitch;
-
-        private float _rollSmoothFactor = 1f;
-        private float _currentRoll;
-
-        private float _currentSpeed;
-        private float _acceleration = 2f;
-        private float _deceleration = 3f;
-        private float _speedInterpolationFactor;
-        private float _pitchMaxDeviationAngle = 20f;
-        private float _crossProductRollDeviation = 0.1f;
 
         private void Move()
         {
@@ -80,19 +72,11 @@ namespace _Game._Hero.Scripts
             {
                 _currentSpeed = SmoothDecelerateSpeed();
             }
-
-            _speedInterpolationFactor = 0.05f;
-            _direction = Vector3.Slerp(_direction, input, Time.deltaTime * _speed * _speedInterpolationFactor);
+            
+            _direction = Vector3.Slerp(_direction, input, 
+                Time.deltaTime * _movementConfig.Speed * _movementConfig.SpeedInterpolationFactor);
             _direction = new Vector3(_direction.x, _direction.y, 0);
             _direction.Normalize();
-            
-            //Vector3 movementProjection = new Vector3(_movement.x, _movement.y, 0);
-
-            // if (movementProjection != Vector3.zero)
-            // {
-            //     _direction = movementProjection;
-            //     _direction.Normalize();
-            // }
 
             Vector3 pos = Position;
             pos += _direction * (_currentSpeed * Time.deltaTime);
@@ -101,12 +85,12 @@ namespace _Game._Hero.Scripts
 
         private float SmoothDecelerateSpeed()
         {
-            return Mathf.Lerp(_currentSpeed, 0, Time.deltaTime * _deceleration);
+            return Mathf.Lerp(_currentSpeed, 0, Time.deltaTime * _movementConfig.Deceleration);
         }
 
         private float SmoothAccelerateSpeed()
         {
-            return Mathf.Lerp(_currentSpeed, _speed, Time.deltaTime * _acceleration);
+            return Mathf.Lerp(_currentSpeed,  _movementConfig.Speed, Time.deltaTime * _movementConfig.Acceleration);
         }
 
         private bool IsInput(Vector3 input) => input != Vector3.zero;
@@ -115,7 +99,7 @@ namespace _Game._Hero.Scripts
         {
             Quaternion targetRotation = Quaternion.LookRotation(this._direction, Vector3.back);
             
-            float maxRotationAngle = _yawSpeed * Time.deltaTime;
+            float maxRotationAngle = _movementConfig.YawSpeed * Time.deltaTime;
             float angle = Quaternion.Angle(Rotation, targetRotation);
             
             float step = Mathf.Min(maxRotationAngle, angle);
@@ -129,15 +113,16 @@ namespace _Game._Hero.Scripts
             
             if (NeedPitch(dotProduct))
             {
-                _currentPitch = Mathf.Lerp(_currentPitch, _pitchMax, _pitchSmoothFactor * Time.deltaTime);
+                _currentPitch = Mathf.Lerp(_currentPitch,  _movementConfig.PitchMax, 
+                    _movementConfig.PitchSmoothFactor * Time.deltaTime);
                 return;
             }
-            _currentPitch = Mathf.Lerp(_currentPitch, 0, _pitchSmoothFactor * Time.deltaTime);
+            _currentPitch = Mathf.Lerp(_currentPitch, 0, _movementConfig.PitchSmoothFactor * Time.deltaTime);
         }
 
         private bool NeedPitch(float dotProduct)
         {
-            return dotProduct > Mathf.Cos(Mathf.Deg2Rad * _pitchMaxDeviationAngle);
+            return dotProduct > Mathf.Cos(Mathf.Deg2Rad * _movementConfig.PitchMaxDeviationAngle);
         }
 
         private void CalculateRoll(Vector3 input)
@@ -147,16 +132,16 @@ namespace _Game._Hero.Scripts
 
             if (NeedRollLeft(crossProduct))
             {
-                _currentRoll = Mathf.Lerp(_currentRoll, _rollMax, _rollSmoothFactor * Time.deltaTime);
+                _currentRoll = Mathf.Lerp(_currentRoll, _movementConfig.RollMax,  _movementConfig.RollSmoothFactor * Time.deltaTime);
                 return;
             }
             if (NeedRollRight(crossProduct))
             {
-                _currentRoll = Mathf.Lerp(_currentRoll, -_rollMax, _rollSmoothFactor * Time.deltaTime);
+                _currentRoll = Mathf.Lerp(_currentRoll, -_movementConfig.RollMax, _movementConfig.RollSmoothFactor * Time.deltaTime);
                 return;
             }
             
-            _currentRoll = Mathf.Lerp(_currentRoll, 0, _rollSmoothFactor);
+            _currentRoll = Mathf.Lerp(_currentRoll, 0, _movementConfig.RollSmoothFactor);
             
             // float signedAngle = Mathf.Atan2(_direction.y, _direction.x) - Mathf.Atan2(input.y, input.x);
             //
@@ -180,54 +165,14 @@ namespace _Game._Hero.Scripts
 
         private bool NeedRollRight(Vector3 crossProduct)
         {
-            return crossProduct.z > _crossProductRollDeviation;
+            return crossProduct.z > _movementConfig.RollDeviation;
         }
 
         private bool NeedRollLeft(Vector3 crossProduct)
         {
-            return crossProduct.z < - _crossProductRollDeviation;
+            return crossProduct.z < -  _movementConfig.RollDeviation;
         }
-
-        // void OnTriggerEnter(Collider other)
-        // {
-        //     Transform rootT = other.gameObject.transform.root;
-        //     GameObject go = rootT.gameObject;
-        //
-        //     if(go == lastTriggerGo)
-        //     {
-        //         return;
-        //     }
-        //     lastTriggerGo = go;
-        //
-        //     if (go.tag == "Enemy")
-        //     {
-        //         shieldLevel--;
-        //
-        //         Enemy enemy = go.GetComponent<Enemy>();
-        //         if (!enemy.notifiedOfDestruction)
-        //         {
-        //             Main.S.ShipDestroyed(enemy);
-        //         }
-        //         enemy.notifiedOfDestruction = true;
-        //
-        //         Destroy(go);
-        //     }
-        //     else if (go.tag == "PowerUp")
-        //     {
-        //         AbsorbPowerUp(go);
-        //     }
-        //     else if (go.tag == "ProjectileEnemy")
-        //     {
-        //         shieldLevel--;
-        //         Destroy(go);
-        //     }
-        //     else
-        //     {
-        //         print("Triggered: " + go.name);
-        //
-        //     }
-        // }
-
+        
         // public void AbsorbPowerUp(GameObject go)
         // {
         //     PowerUp pu = go.GetComponent<PowerUp>();

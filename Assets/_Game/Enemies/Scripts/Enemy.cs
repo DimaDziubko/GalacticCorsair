@@ -3,6 +3,8 @@ using _Game.Core.Services.Audio;
 using _Game.Core.Services.Camera;
 using _Game.Core.Services.Random;
 using _Game.Enemies.Scripts.Factory;
+using _Game.PowerUp.Scripts;
+using _Game.PowerUp.Scripts.Factory;
 using _Game.Vfx.Scripts.Factory;
 using UnityEngine;
 
@@ -12,16 +14,22 @@ namespace _Game.Enemies.Scripts
     {
         public EnemyFactory OriginFactory { get; set; }
 
-        [SerializeField] private EnemyLinearMove _move;
+        [SerializeField] private EnemyMove _move;
         [SerializeField] private BoundsCheck _boundsCheck;
         
         private EnemyType _type;
 
         private IVfxFactory _vfxFactory;
         private IVfxAudioSourceService _audioSourceService;
+        private IPowerUpFactory _powerUpFactory;
+
+        private IRandomService _randomService;
 
         private AudioClip _impactSound;
-        
+
+        private float _powerUpDropChance;
+
+
         private float _health;
         private bool IsDead => _health <= 0;
 
@@ -38,21 +46,26 @@ namespace _Game.Enemies.Scripts
         
         public void Construct(
             EnemyType type,
-            float speed,
+            EnemyMovementConfig movementConfig,
             float health,
             AudioClip impactSound,
+            float powerUpDropChance,
             IWorldCameraService cameraService,
             IVfxAudioSourceService audioSourceService,
             IVfxFactory vfxFactory,
-            IRandomService randomService)
+            IRandomService randomService,
+            IPowerUpFactory powerUpFactory)
         {
             _type = type;
-            _move.Initialize(speed, cameraService, randomService);
+            _move.Initialize(movementConfig, cameraService, randomService);
             _health = health;
             _impactSound = impactSound;
             _boundsCheck.Construct(cameraService);
             _audioSourceService = audioSourceService;
             _vfxFactory = vfxFactory;
+            _powerUpDropChance = powerUpDropChance;
+            _randomService = randomService;
+            _powerUpFactory = powerUpFactory;
         }
 
         public override bool GameUpdate()
@@ -61,6 +74,7 @@ namespace _Game.Enemies.Scripts
             {
                 ShowImpact();
                 PlaySound();
+                DropPowerUp();
                 Recycle();
                 return false;
             }
@@ -79,8 +93,8 @@ namespace _Game.Enemies.Scripts
             {
                 return;
             }
-            
-            _boundsCheck.GameLateUpdate();
+            if(_boundsCheck)
+                _boundsCheck.GameLateUpdate();
         }
 
         public void TakeDamage(float damage)
@@ -107,6 +121,16 @@ namespace _Game.Enemies.Scripts
         private void PlaySound()
         {
             _audioSourceService.PlayOneShot(_impactSound);
+        }
+
+        private void DropPowerUp()
+        {
+            float value = _randomService.GetValue();
+            if (value <= _powerUpDropChance)
+            {
+                Powerup powerUp = _powerUpFactory.Get();
+                powerUp.Position = transform.position;
+            }
         }
     }
 }

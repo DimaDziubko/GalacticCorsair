@@ -16,19 +16,21 @@ namespace _Game._Weapon._Projectile.Scripts
     {
         [SerializeField] private BoundsCheck _boundsCheck;
 
-        private WeaponType _type;
-        
-        private IVfxFactory _vfxFactory;
-        
-        private IVfxAudioSourceService _audioSourceService;
-        private AudioClip _hitSound;
-        
-        private float _damageOnHit;
-
         public ProjectileFactory OriginFactory { get; set; }
 
         public Rigidbody Rigidbody;
+        
+        private WeaponType _type;
 
+        private IVfxFactory _vfxFactory;
+
+        private IVfxAudioSourceService _audioSourceService;
+        private AudioClip _hitSound;
+
+        private float _damageOnHit;
+
+        private bool _isDestroyed = false;
+        
         public void Construct(
             WeaponType type,
             float damageOnHit,
@@ -47,7 +49,7 @@ namespace _Game._Weapon._Projectile.Scripts
         
         public override bool GameUpdate()
         {
-            if (!_boundsCheck.IsOnScreen)
+            if (!_boundsCheck.IsOnScreen || _isDestroyed)
             {
                 Recycle();
                 return false;
@@ -78,8 +80,8 @@ namespace _Game._Weapon._Projectile.Scripts
                 PlaySound();
 
                 enemy.TakeDamage(_damageOnHit);
-                
-                Recycle();
+
+                _isDestroyed = true;
             }
         }
 

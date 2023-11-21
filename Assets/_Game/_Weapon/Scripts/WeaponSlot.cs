@@ -5,6 +5,10 @@ namespace _Game._Weapon.Scripts
 {
     public class WeaponSlot : MonoBehaviour
     {
+        public WeaponType WeaponType
+        {
+            get => _weaponType;
+        }
         public Weapon Weapon
         {
             get => _weapon;
@@ -15,14 +19,21 @@ namespace _Game._Weapon.Scripts
         private Weapon _weapon;
         private AudioSource _audioSource;
 
-        public void Construct(IWeaponFactory weaponFactory)
+        private bool _needWeaponModel;
+        private WeaponType _weaponType;
+
+        public void Construct(IWeaponFactory weaponFactory, bool needWeaponModel)
         {
             _weaponFactory = weaponFactory;
+            _needWeaponModel = needWeaponModel;
+            _weaponType = WeaponType.None;
         }
         
         public void SetWeapon(WeaponType type)
         {
             Weapon = _weaponFactory.Get(type, transform);
+            _weaponType = type;
+            Weapon.ModelVisibility = _needWeaponModel;
         }
 
         public void RemoveWeapon()

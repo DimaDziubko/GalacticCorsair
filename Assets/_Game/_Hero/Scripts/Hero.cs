@@ -7,6 +7,7 @@ using _Game.Core.Services.Audio;
 using _Game.Core.Services.Camera;
 using _Game.Core.Services.Input;
 using _Game.Enemies.Scripts;
+using _Game.PowerUp.Scripts;
 using UnityEngine;
 
 namespace _Game._Hero.Scripts
@@ -24,22 +25,24 @@ namespace _Game._Hero.Scripts
         private float _health;
         private float _maxHealth;
         private bool _isDead => _health <= 0;
+        public bool IsDead
+        {
+            get => _isDead;
+        }
 
         public void Construct(
-            IInputService inputService, 
-            float speed, 
-            float rollMult,
-            float pitchMult,
+            IInputService inputService,
             float health,
             float shieldCapacity,
             float rippleDuration,
             IWeaponFactory weaponFactory,
             IWorldCameraService cameraService,
             IVfxAudioSourceService audioSourceService,
-            AudioClip shieldHitSound)
+            AudioClip shieldHitSound,
+            HeroMovementConfig movementConfig)
         {
             _health = _maxHealth = health;
-            _heroMove.Construct(inputService, speed, rollMult, pitchMult);
+            _heroMove.Construct(inputService, movementConfig);
             _heroWeapon.Construct(inputService, weaponFactory, _heroMove);
             _heroShield.Construct(
                 shieldCapacity, 
@@ -53,11 +56,24 @@ namespace _Game._Hero.Scripts
         {
             _heroShield.ShieldCapacityChanged += handler;
         }
-        
+
+        public void UnSubscribeToShieldCapacityChange(Action<float, float> handler)
+        {
+            _heroShield.ShieldCapacityChanged -= handler;
+        }
+
+        public void TakeDamage(float damage)
+        {
+            _health -= damage;
+            
+            HealthChanged?.Invoke(_health, _maxHealth);
+        }
+
         public override bool GameUpdate()
         {
             if (_isDead)
             {
+                _heroWeapon.ClearWeapon();
                 Recycle();
                 return false;
             }
@@ -70,7 +86,8 @@ namespace _Game._Hero.Scripts
         public override void GameLateUpdate()
         {
             if(_isDead) return;
-            _boundsCheck.GameLateUpdate();
+            if(_boundsCheck)
+                _boundsCheck.GameLateUpdate();
         }
 
         public override void Recycle()
@@ -87,13 +104,27 @@ namespace _Game._Hero.Scripts
                 enemy.TakeFullDamage();
                 return;
             }
+            
+            if (other.collider.TryGetComponent(out Powerup powerUp))
+            {
+                Absorb(powerUp);
+            }
         }
 
-        public void TakeDamage(float damage)
+        private void Absorb(Powerup powerUp)
         {
-            _health -= damage;
-            
-            HealthChanged?.Invoke(_health, _maxHealth);
+            switch (powerUp.PowerUpType)
+            {
+                case PowerUpType.Health:
+                    break;
+                case PowerUpType.Energy:
+                    break;
+                case PowerUpType.Weapon:
+                    _heroWeapon.Upgrade(powerUp.WeaponType);
+                    break;
+            }
+
+            powerUp.Absorbed = true;
         }
 
         private void TakeFullDamage()

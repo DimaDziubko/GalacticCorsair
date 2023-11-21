@@ -60,7 +60,7 @@ Material:
     - _QueueOffset: 0
     - _VertexOffsetFreq: 4
     m_Colors:
-    - _Color: {r: 0, g: 4.061485, b: 118.035385, a: 1}
-    - _FrenselColor: {r: 1.5078533, g: 33.00523, b: 42.722507, a: 1}
+    - _Color: {r: 31.999996, g: 0.8526033, b: 0, a: 1}
+    - _FrenselColor: {r: 6.9433966, g: 0, b: 1.4133606, a: 1}
     - _VertexOffsetDirection: {r: 0.7, g: 0.7, b: 0.7, a: 0}
   m_BuildTextureStacks: []

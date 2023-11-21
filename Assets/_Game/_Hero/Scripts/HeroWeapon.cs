@@ -9,6 +9,7 @@ namespace _Game._Hero.Scripts
 {
     public class HeroWeapon : MonoBehaviour
     {
+        public bool NeedWeaponModel;
         public event Action<Vector3> NeedFire;
         
         private IInputService _inputService;
@@ -32,7 +33,7 @@ namespace _Game._Hero.Scripts
         {
             foreach (var weapon in _weapons)
             {
-                weapon.Construct(weaponFactory);
+                weapon.Construct(weaponFactory, NeedWeaponModel);
             }
         }
 
@@ -47,27 +48,14 @@ namespace _Game._Hero.Scripts
         private void ResetWeapon()
         {
             ClearWeapon();
-            foreach (var slot in _weapons)
-            {
-                slot.SetWeapon(WeaponType.Blaster);
-            }
+            var slot = _weapons[0];
+            slot.SetWeapon(WeaponType.Blaster);
+            NeedFire += slot.Weapon.Fire;
             
-            foreach (var slot in _weapons)
-            {
-                if (slot.Weapon != null)
-                {
-                    NeedFire += slot.Weapon.Fire;
-                }
-            }
-            
-            // var slot = _weapons[0];
-            // slot.SetWeapon(WeaponType.Blaster);
-            // NeedFire += slot.Weapon.Fire;
-            //
         }
 
         [Button]
-        private void ClearWeapon()
+        public void ClearWeapon()
         {
             foreach (WeaponSlot slot in _weapons)
             {
@@ -79,5 +67,30 @@ namespace _Game._Hero.Scripts
             } 
         }
 
+        public void Upgrade(WeaponType powerUpWeaponType)
+        {
+            if (_weapons[0].WeaponType != powerUpWeaponType)
+            {
+                ClearWeapon();
+                SetupWeapon(powerUpWeaponType, 0);
+                return;
+            }
+
+            for (int i = 0; i < _weapons.Length; i++)
+            {
+                if (_weapons[i].Weapon == null)
+                {
+                    SetupWeapon(powerUpWeaponType, i);
+                    break;
+                }
+            }
+            
+        }
+
+        private void SetupWeapon(WeaponType weaponType, int slotIndex)
+        {
+            _weapons[slotIndex].SetWeapon(weaponType);
+            NeedFire += _weapons[slotIndex].Weapon.Fire;
+        }
     }
 }

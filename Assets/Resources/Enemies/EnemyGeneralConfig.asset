@@ -1,0 +1,71 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a85b519a8d64df786d159563248db88, type: 3}
+  m_Name: EnemyGeneralConfig
+  m_EditorClassIdentifier: 
+  Configs:
+  - Type: 1
+    EnemyPrefab: {fileID: 6807196235532120055, guid: 0240db03860c3b943bc54793283796ef,
+      type: 3}
+    MovementConfig:
+      Speed:
+        _min: 10
+        _max: 10
+      WaveFrequency: 2
+      WaveWidth: 4
+      Roll: 45
+    Speed:
+      _min: 5
+      _max: 20
+    FireRate:
+      _min: 0.3
+      _max: 0.3
+    Health:
+      _min: 2
+      _max: 5
+    Score: 100
+    ShowDamageDuration: 0.1
+    PowerUpDropChance:
+      _min: 0.1
+      _max: 0.25
+    ExplosionPrefab: {fileID: 2158589809004103191, guid: ee50b97b21671b846bd8c0da113c91b3,
+      type: 3}
+    ExplosionDuration: 3
+    ExplosionSound: {fileID: 8300000, guid: 7e01778ca13365144bfbb4f03f55d64a, type: 3}
+  - Type: 2
+    EnemyPrefab: {fileID: 7719042373425329699, guid: 4f80ba6564e8c994fadaab670e33fea6,
+      type: 3}
+    MovementConfig:
+      Speed:
+        _min: 10
+        _max: 10
+      WaveFrequency: 2
+      WaveWidth: 4
+      Roll: 45
+    Speed:
+      _min: 7
+      _max: 20
+    FireRate:
+      _min: 0.3
+      _max: 0.3
+    Health:
+      _min: 3
+      _max: 6
+    Score: 150
+    ShowDamageDuration: 0.1
+    PowerUpDropChance:
+      _min: 1
+      _max: 1
+    ExplosionPrefab: {fileID: 2158589809004103191, guid: 930676ed725780b408a320e5ef4c1535,
+      type: 3}
+    ExplosionDuration: 3
+    ExplosionSound: {fileID: 8300000, guid: 7e01778ca13365144bfbb4f03f55d64a, type: 3}

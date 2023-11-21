@@ -13,6 +13,9 @@ MonoBehaviour:
   m_Name: Wave_1
   m_EditorClassIdentifier: 
   _spawnSequences:
-  - _type: 1
-    _amount: 20
-    _cooldown: 3
+  - _type: 2
+    _amount: 1
+    _cooldown: 2
+  - _type: 2
+    _amount: 1
+    _cooldown: 4

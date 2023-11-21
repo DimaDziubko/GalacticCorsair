@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections;
+using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -34,5 +36,17 @@ namespace _Game.Core
             
             onLoaded?.Invoke();
         }
+
+        public AsyncOperation LoadSceneAsync(string name, LoadSceneMode mode)
+        {
+            var loadOp = SceneManager.LoadSceneAsync(name, mode);
+            return loadOp;
+        }
+
+        public Scene GetSceneByName(string name) => 
+            SceneManager.GetSceneByName(name);
+
+        public AsyncOperation UnloadSceneAsync(string sceneName) => 
+            SceneManager.UnloadSceneAsync(sceneName);
     }
 }

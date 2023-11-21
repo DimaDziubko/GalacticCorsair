@@ -1,8 +1,9 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using _Game._Hero.Scripts.Factory;
 using _Game._Weapon._Projectile.Factory;
 using _Game._Weapon.Scripts.Factory;
-using _Game.Core.AssetManagment;
+using _Game.Core.AssetManagement;
+using _Game.Core.Loading.Scripts;
 using _Game.Core.Services;
 using _Game.Core.Services._Game.StaticData;
 using _Game.Core.Services.Audio;
@@ -10,6 +11,7 @@ using _Game.Core.Services.Camera;
 using _Game.Core.Services.Input;
 using _Game.Core.Services.Random;
 using _Game.Enemies.Scripts.Factory;
+using _Game.PowerUp.Scripts.Factory;
 using _Game.StaticData;
 using _Game.Utils;
 using _Game.Vfx.Scripts.Factory;
@@ -22,48 +24,63 @@ namespace _Game.Core.GameState
         private readonly GameStateMachine _stateMachine;
         private readonly SceneLoader _sceneLoader;
         private readonly AllServices _services;
+        private readonly Camera _uiCamera;
 
         public BootstrapState(
             GameStateMachine stateMachine, 
             SceneLoader sceneLoader, 
-            AllServices services)
+            AllServices services,
+            Camera uiCamera)
         {
             _stateMachine = stateMachine;
             _sceneLoader = sceneLoader;
             _services = services;
+            _uiCamera = uiCamera;
             
             RegisterServices();
         }
         
         public void Enter()
         {
-            _sceneLoader.Load(Constants.Scenes.STARTUP, EnterLoadLevel);
+            _sceneLoader.Load(Constants.Scenes.STARTUP, EnterMenuState);
+        }
+
+        private void EnterMenuState()
+        {
+            var loadingOperations = new Queue<ILoadingOperation>();
+            loadingOperations.Enqueue(_services.Single<IAssetProvider1>());
+            loadingOperations.Enqueue(new MenuLoadingOperation(
+                _sceneLoader,
+                _stateMachine,
+                _services.Single<IWorldCameraService>()));
+            _stateMachine.Enter<MenuState, Queue<ILoadingOperation>>(loadingOperations);
         }
 
         public void Exit()
         {
             
         }
-
-        private void EnterLoadLevel() => 
-            _stateMachine.Enter<LoadLevelState, string>( Constants.Scenes.LEVEL_1);
-
+        
         private void RegisterServices()
         {
             _services.RegisterSingle<IRandomService>(new UnityRandomService());
             _services.RegisterSingle(InputService());
-            _services.RegisterSingle<IWorldCameraService>(new WorldCameraService());
+            _services.RegisterSingle<IWorldCameraService>(new WorldCameraService(_uiCamera));
+            _services.RegisterSingle<ILoadingScreenProvider>(
+                new LoadingScreenProvider(_services.Single<IWorldCameraService>()));
             _services.RegisterSingle<IVfxAudioSourceService>(new VfxAudioSourceService());
 
 
             RegisterStaticDataService();
 
             _services.RegisterSingle<IAssets>(new AssetProvider());
+            _services.RegisterSingle<IAssetProvider1>(new AssetProvider1());
 
             RegisterVfxFactory();
             RegisterProjectileFactory();
             RegisterWeaponFactory();
             RegisterHeroFactory();
+            RegisterPowerUpFactory();
             RegisterEnemyFactory();
 
             _services.RegisterSingle<IGameStateMachine>(_stateMachine);
@@ -87,10 +104,22 @@ namespace _Game.Core.GameState
                 _services.Single<IWorldCameraService>(),
                 _services.Single<IVfxAudioSourceService>(),
                 _services.Single<IVfxFactory>(),
+                _services.Single<IPowerUpFactory>(),
                 _services.Single<IRandomService>());
             _services.RegisterSingle<IEnemyFactory>(enemyFactory);
         }
 
+        private void RegisterPowerUpFactory()
+        {
+            IAssets assets = _services.Single<IAssets>();
+            PowerUpFactory powerUpFactory = assets.Load<PowerUpFactory>(AssetAddress.POWER_UP_FACTORY_PATH);
+            powerUpFactory.Construct(
+                _services.Single<IStaticDataService>(),
+                _services.Single<IWorldCameraService>(),
+                _services.Single<IRandomService>());
+            _services.RegisterSingle<IPowerUpFactory>(powerUpFactory);
+        }
+        
         private void RegisterProjectileFactory()
         {
             IAssets assets = _services.Single<IAssets>();
@@ -109,6 +138,7 @@ namespace _Game.Core.GameState
             staticData.LoadEnemies();
             staticData.LoadWeapons();
             staticData.LoadHeroes();
+            staticData.LoadPowerUps();
             _services.RegisterSingle<IStaticDataService>(staticData);
         }
 

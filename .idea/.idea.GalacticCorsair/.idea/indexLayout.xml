@@ -3,14 +3,20 @@
   <component name="ContentModelUserStore">
     <attachedFolders />
     <explicitIncludes>
+      <Path>Library/PackageCache/com.cysharp.unitask@5cc97c7f00</Path>
+      <Path>Library/PackageCache/com.unity.addressables@1.21.19</Path>
       <Path>Library/PackageCache/com.unity.burst@1.8.7</Path>
       <Path>Library/PackageCache/com.unity.collab-proxy@2.0.5</Path>
+      <Path>Library/PackageCache/com.unity.connect.share@4.2.3</Path>
+      <Path>Library/PackageCache/com.unity.editorcoroutines@1.0.0</Path>
       <Path>Library/PackageCache/com.unity.ext.nunit@1.0.6</Path>
       <Path>Library/PackageCache/com.unity.ide.rider@3.0.24</Path>
       <Path>Library/PackageCache/com.unity.ide.visualstudio@2.0.18</Path>
       <Path>Library/PackageCache/com.unity.ide.vscode@1.2.5</Path>
       <Path>Library/PackageCache/com.unity.mathematics@1.2.6</Path>
+      <Path>Library/PackageCache/com.unity.scriptablebuildpipeline@1.21.21</Path>
       <Path>Library/PackageCache/com.unity.searcher@4.9.2</Path>
+      <Path>Library/PackageCache/com.unity.settings-manager@2.0.1</Path>
       <Path>Library/PackageCache/com.unity.test-framework@1.1.33</Path>
       <Path>Library/PackageCache/com.unity.textmeshpro@3.0.6</Path>
       <Path>Library/PackageCache/com.unity.timeline@1.7.5</Path>
@@ -28,6 +34,7 @@
       <Path>Temp</Path>
       <Path>Test_BurstDebugInformation_DoNotShip</Path>
       <Path>UserSettings</Path>
+      <Path>WebGL Builds</Path>
       <Path>obj</Path>
     </explicitExcludes>
   </component>

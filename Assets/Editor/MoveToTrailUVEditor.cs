@@ -1,4 +1,5 @@
 ﻿using System;
+using _Game._Weapon.Blaster.Scripts;
 using UnityEngine;
 using UnityEditor;
 

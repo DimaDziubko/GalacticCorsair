@@ -11,7 +11,13 @@ namespace _Game._Weapon.Scripts
     public class Weapon : MonoBehaviour
     {
         [SerializeField] private Transform _collarTransform;
+        [SerializeField] private GameObject _weaponModel;
 
+        public bool ModelVisibility
+        {
+            set => _weaponModel.SetActive(value);
+        }
+        
         private IVfxFactory _vfxFactory;
         
         private AudioClip _shotSound;

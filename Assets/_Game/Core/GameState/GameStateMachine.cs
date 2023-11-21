@@ -2,11 +2,15 @@
 using System.Collections.Generic;
 using _Game._Hero.Scripts.Factory;
 using _Game._Weapon._Projectile.Factory;
+using _Game.Core.AssetManagement;
+using _Game.Core.Loading.Scripts;
 using _Game.Core.Services;
 using _Game.Core.Services.Camera;
 using _Game.Core.Services.Random;
 using _Game.Enemies.Scripts.Factory;
+using _Game.PowerUp.Scripts.Factory;
 using _Game.Vfx.Scripts.Factory;
+using UnityEngine;
 
 namespace _Game.Core.GameState
 {
@@ -15,11 +19,12 @@ namespace _Game.Core.GameState
         private readonly Dictionary<Type, IExitableState> _states;
         private IExitableState _activeState;
 
-        public GameStateMachine(SceneLoader sceneLoader, AllServices services)
+        public GameStateMachine(SceneLoader sceneLoader, AllServices services, Camera uiCamera)
         {
             _states = new Dictionary<Type, IExitableState>()
             {
-                [typeof(BootstrapState)] = new BootstrapState(this, sceneLoader, services),
+                [typeof(BootstrapState)] = new BootstrapState(this, sceneLoader, services, uiCamera),
+                [typeof(MenuState)] = new MenuState(services.Single<ILoadingScreenProvider>()),
                 [typeof(LoadLevelState)] = new LoadLevelState(
                     this, 
                     sceneLoader, 
@@ -28,7 +33,9 @@ namespace _Game.Core.GameState
                     services.Single<IEnemyFactory>(),
                     services.Single<IRandomService>(),
                     services.Single<IProjectileFactory>(),
-                    services.Single<IVfxFactory>()),
+                    services.Single<IVfxFactory>(),
+                    services.Single<IPowerUpFactory>(),
+                    services.Single<ILoadingScreenProvider>()),
                 [typeof(GameLoopState)] = new GameLoopState(this),
             };
         }
